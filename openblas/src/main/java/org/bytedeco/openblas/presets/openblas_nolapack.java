@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2024 Samuel Audet
+ * Copyright (C) 2016-2025 Samuel Audet
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ public class openblas_nolapack implements LoadEnabled, InfoMapper {
 
     @Override public void init(ClassProperties properties) {
         String platform = properties.getProperty("platform");
+        List<String> links = properties.get("platform.link");
         List<String> preloads = properties.get("platform.preload");
         List<String> resources = properties.get("platform.preloadresource");
         String className = getClass().getSimpleName(); // "openblas_nolapack" or "openblas"
@@ -105,7 +106,11 @@ public class openblas_nolapack implements LoadEnabled, InfoMapper {
             }
         }
 
-        if (lib.length() > 0) {
+        if (lib.equals("none")) {
+            links.clear();
+            preloads.clear();
+            properties.setProperty("platform.library", "#none#");
+        } else if (lib.length() > 0) {
             if (platform.startsWith("linux")) {
                 preloads.add(i, lib + "#" + className + "@.0");
             } else if (platform.startsWith("macosx")) {
